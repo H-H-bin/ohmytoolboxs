@@ -1,6 +1,6 @@
-# OhMyToolboxs - ADB Tools �
+# OhMyToolboxs - Android Development Tools
 
-A comprehensive Android Debug Bridge (ADB) toolbox application built with Rust and egui, designed specifically for Android development and device management.
+A comprehensive Android development toolbox application built with Rust and egui, featuring ADB and Fastboot tools for complete Android device management and firmware operations.
 
 ## Features
 
@@ -47,6 +47,117 @@ A comprehensive Android Debug Bridge (ADB) toolbox application built with Rust a
   - **Journal Management**: View system logs, errors, and manage journal storage
   - **Dependency Tracking**: List service dependencies and system environment
 
+### ⚡ Android Fastboot Tools
+
+**Device Management**
+- Detect and connect to Android devices in fastboot mode
+- Device information and variable inspection
+- Fastboot availability checking and tool validation
+
+**Flash Operations**
+- Flash firmware images to specific partitions (boot, recovery, system, etc.)
+- Support for standard Android partitions with safety validations
+- Real-time progress indication for flash operations
+- Comprehensive error handling and result reporting
+
+**Bootloader Management**
+- Unlock and lock bootloader operations with safety warnings
+- Bootloader status checking and verification
+- Secure handling of bootloader state changes
+
+**Partition Operations**
+- Erase partitions safely (cache, userdata, etc.)
+- Format partitions with proper file system setup
+- Partition management with comprehensive safety checks
+
+**System Operations**
+- Boot from image files without permanent flashing
+- Flash complete firmware packages from update ZIP files
+- Reboot to different modes (system, bootloader, recovery, fastboot)
+- System-level operations with proper validation
+
+**Safety Features**
+- ⚠️ **Comprehensive warnings** for destructive operations
+- **Data loss prevention** with multiple confirmation steps
+- **Device compatibility** checking before operations
+- **Operation logging** and detailed error reporting
+
+### 📱 Qualcomm Download Tool (QDL)
+
+**Device Management**
+- Detect and connect to Qualcomm devices in EDL/9008 mode
+- Device information and communication status monitoring
+- Sahara and Firehose protocol support
+
+**Flash Operations**
+- Flash firmware images to specific partitions with progress tracking
+- Support for META file-based flashing operations
+- Comprehensive safety validations and error handling
+- Real-time progress indication for flash operations
+
+**Partition Management**
+- List available partitions with detailed information
+- Set partitions as bootable for system recovery
+- Erase specific partitions with safety confirmations
+- LUN (Logical Unit Number) support for storage device selection (0-7)
+
+**Storage Operations**
+- Dump partition contents to files for backup purposes
+- Storage device recovery and management
+- File-based storage operations with progress monitoring
+
+**Memory Operations**
+- Memory peek operations to read specific memory addresses
+- Memory poke operations to write data to memory locations
+- Memory dump collection for debugging and analysis
+- Address range validation and safety checks
+
+**System Operations**
+- Reboot device to different modes (normal, EDL, fastboot)
+- Load programmer files for low-level operations
+- NOP (No Operation) commands for testing communication
+- System-level debugging and recovery operations
+
+### 🧠 Qualcomm RAM Dump Tool (QRamdump)
+
+**Device Management**
+- Detect and connect to crashed Qualcomm devices
+- Device crash status monitoring and validation
+- Communication interface management for dump collection
+
+**Memory Dump Collection**
+- **Full System Dump**: Complete memory image collection
+- **Partial Dump**: Selective memory region dumping
+- **Selective Dump**: Custom memory range specification
+- **Kernel Only**: Kernel space memory collection
+- **User Only**: User space memory collection
+- Progress tracking and estimated time calculation
+
+**Crash Analysis**
+- **Log Extraction**: System logs and crash logs analysis
+- **Stack Trace**: Call stack analysis and debugging information
+- **Exception Details**: Exception type and cause analysis
+- **Memory Analysis**: Memory corruption and leak detection
+- Comprehensive crash report generation
+
+**File Management**
+- Dump file compression and organization
+- Export dumps in various formats
+- File naming with timestamps and device information
+- Storage management and cleanup utilities
+
+**System Information**
+- Hardware configuration and device specifications
+- Software version and build information
+- System state analysis at time of crash
+- Environmental data collection (temperature, voltage, etc.)
+
+**Safety Features**
+- ⚠️ **Non-destructive operations** - Read-only memory access
+- **Device state preservation** during dump collection
+- **Automatic error recovery** if communication fails
+- **Progress monitoring** with ability to pause/resume operations
+
 ## Technical Details
 
 - **Framework**: Built with [egui](https://github.com/emilk/egui) for immediate mode GUI
@@ -83,9 +194,17 @@ Access via **File → Settings** in the top menu bar:
 
 - Rust 1.70+ (with Cargo)
 - Git
-- Android Debug Bridge (ADB) - Required for ADB Tools functionality
+- **Android Debug Bridge (ADB)** - Required for ADB Tools functionality
   - Install via Android SDK Platform Tools or standalone ADB
   - Ensure `adb` command is available in your system PATH
+- **Android Fastboot** - Required for Fastboot Tools functionality
+  - Usually included with Android SDK Platform Tools
+  - Ensure `fastboot` command is available in your system PATH
+  - **Important**: Fastboot requires devices to be in fastboot/bootloader mode
+- **Qualcomm Tools** - Required for QDL and QRamdump Tools functionality
+  - QDL (Qualcomm Download Tool) support for EDL/9008 mode operations
+  - QRamdump tool support for memory dump collection and crash analysis
+  - **Important**: These tools require Qualcomm devices in specific modes (EDL for QDL, crashed state for QRamdump)
 
 ### Build from Source
 ```bash
@@ -118,7 +237,9 @@ src/
 │   ├── system_tools.rs # System information and process tools
 │   ├── network_tools.rs # Network diagnostic tools
 │   ├── file_tools.rs # File management utilities
-│   └── dev_tools.rs  # Developer utilities
+│   ├── dev_tools.rs  # Developer utilities
+│   ├── qdl_tools.rs  # Qualcomm Download Tool (QDL) for EDL/9008 mode
+│   └── qramdump_tools.rs # Qualcomm RAM Dump Tool for crash analysis
 └── ui/               # User interface components
     ├── mod.rs        # UI module definitions
     ├── sidebar.rs    # Navigation sidebar
@@ -143,6 +264,9 @@ src/
 - Color tools with palette generation and format conversion
 - File compression and decompression utilities
 - More text encoding formats (hex, binary, etc.)
+- **QDL Tools Enhancements**: Advanced partition management and custom programmer support
+- **QRamdump Tools Enhancements**: Real-time crash monitoring and automated analysis reports
+- **Qualcomm Tool Integration**: Batch operations and configuration management for QDL/QRamdump workflows
 
 ## Contributing
 

@@ -1,22 +1,37 @@
 use eframe::egui;
 use crate::tools::ToolCategory;
 use crate::tools::adb_tools::{AdbToolsState, show_adb_tools};
+use crate::tools::fastboot_tools::{FastbootToolsState, show_fastboot_tools};
+use crate::tools::qdl_tools::{QdlToolsState, show_qdl_tools};
+use crate::tools::qramdump_tools::{QramdumpToolsState, show_qramdump_tools};
 
 pub struct ContentArea {
     adb_tools: AdbToolsState,
+    fastboot_tools: FastbootToolsState,
+    qdl_tools: QdlToolsState,
+    qramdump_tools: QramdumpToolsState,
 }
 
-impl ContentArea {
-    pub fn new() -> Self {
+impl ContentArea {    pub fn new() -> Self {
         Self {
             adb_tools: AdbToolsState::default(),
+            fastboot_tools: FastbootToolsState::default(),
+            qdl_tools: QdlToolsState::default(),
+            qramdump_tools: QramdumpToolsState::default(),
         }
-    }
-
-    pub fn render(&mut self, ui: &mut egui::Ui, selected_tool: &Option<ToolCategory>) {
+    }    pub fn render(&mut self, ui: &mut egui::Ui, selected_tool: &Option<ToolCategory>) {
         match selected_tool {
             Some(ToolCategory::AdbTools) => {
                 show_adb_tools(ui, &mut self.adb_tools);
+            }
+            Some(ToolCategory::FastbootTools) => {
+                show_fastboot_tools(ui, &mut self.fastboot_tools);
+            }
+            Some(ToolCategory::QdlTools) => {
+                show_qdl_tools(ui, &mut self.qdl_tools);
+            }
+            Some(ToolCategory::QramdumpTools) => {
+                show_qramdump_tools(ui, &mut self.qramdump_tools);
             }
             None => {
                 self.render_welcome(ui);
@@ -71,13 +86,33 @@ impl ContentArea {
                 });
             });
         });
-    }
-
-    pub fn get_adb_tools_state_mut(&mut self) -> &mut AdbToolsState {
+    }    pub fn get_adb_tools_state_mut(&mut self) -> &mut AdbToolsState {
         &mut self.adb_tools
     }
 
     pub fn get_adb_tools_state(&self) -> &AdbToolsState {
         &self.adb_tools
+    }
+
+    pub fn get_fastboot_tools_state_mut(&mut self) -> &mut FastbootToolsState {
+        &mut self.fastboot_tools
+    }    pub fn get_fastboot_tools_state(&self) -> &FastbootToolsState {
+        &self.fastboot_tools
+    }
+
+    pub fn get_qdl_tools_state_mut(&mut self) -> &mut QdlToolsState {
+        &mut self.qdl_tools
+    }
+
+    pub fn get_qdl_tools_state(&self) -> &QdlToolsState {
+        &self.qdl_tools
+    }
+
+    pub fn get_qramdump_tools_state_mut(&mut self) -> &mut QramdumpToolsState {
+        &mut self.qramdump_tools
+    }
+
+    pub fn get_qramdump_tools_state(&self) -> &QramdumpToolsState {
+        &self.qramdump_tools
     }
 }

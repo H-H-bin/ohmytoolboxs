@@ -41,13 +41,16 @@ pub struct OhMyToolboxsApp {
     
     #[serde(skip)]
     config_settings_open: bool,
-    
-    // Custom config path dialog state
+      // Custom config path dialog state
     #[serde(skip)]
     show_custom_path_dialog: bool,
     
     #[serde(skip)]
     custom_config_path: String,
+    
+    // About dialog state
+    #[serde(skip)]
+    about_open: bool,
 }
 
 impl Default for OhMyToolboxsApp {
@@ -64,10 +67,10 @@ impl Default for OhMyToolboxsApp {
             sidebar_width: config.app_settings.sidebar_width,
             tool_visibility: config.app_settings.tool_visibility,
             settings_open: false,
-            adb_settings_open: false,
-            config_settings_open: false,
+            adb_settings_open: false,            config_settings_open: false,
             show_custom_path_dialog: false,
             custom_config_path: String::new(),
+            about_open: false,
         }
     }
 }
@@ -124,10 +127,14 @@ impl eframe::App for OhMyToolboxsApp {
         if self.adb_settings_open {
             self.render_adb_settings_dialog(ctx);
         }
-        
-        // Render config settings dialog if open
+          // Render config settings dialog if open
         if self.config_settings_open {
             self.render_config_settings_dialog(ctx);
+        }
+        
+        // Render about dialog if open
+        if self.about_open {
+            self.render_about_dialog(ctx);
         }
     }
 }
@@ -173,12 +180,9 @@ impl OhMyToolboxsApp {
                         self.dark_mode = !self.dark_mode;
                         ui.close_menu();
                     }
-                });
-
-                ui.menu_button("Help", |ui| {
+                });                ui.menu_button("Help", |ui| {
                     if ui.button("About").clicked() {
-                        // Show about dialog with build info
-                        self.show_about_dialog(ui);
+                        self.about_open = true;
                         ui.close_menu();
                     }
                 });
@@ -211,42 +215,113 @@ impl OhMyToolboxsApp {
         egui::CentralPanel::default().show(ctx, |ui| {
             self.content_area.render(ui, &self.selected_tool);
         });
-    }
-
-    fn show_about_dialog(&mut self, ui: &mut egui::Ui) {
+    }    fn render_about_dialog(&mut self, ctx: &egui::Context) {
         egui::Window::new("About OhMyToolboxs")
             .resizable(false)
             .collapsible(false)
-            .show(ui.ctx(), |ui| {
+            .default_width(400.0)
+            .show(ctx, |ui| {
                 ui.vertical_centered(|ui| {
                     ui.heading("🧰 OhMyToolboxs");
+                    ui.add_space(5.0);
+                    ui.label(RichText::new("Android Development Tools").italics());
+                    ui.add_space(15.0);
+                    
+                    // Version Information
+                    ui.group(|ui| {
+                        ui.label(RichText::new("📦 Version Information").strong());
+                        ui.add_space(5.0);
+                        
+                        egui::Grid::new("version_grid")
+                            .num_columns(2)
+                            .spacing([10.0, 5.0])
+                            .show(ui, |ui| {
+                                ui.label("Version:");
+                                ui.label(RichText::new(env!("APP_VERSION")).strong());
+                                ui.end_row();
+                                
+                                ui.label("Target:");
+                                ui.label(env!("TARGET"));
+                                ui.end_row();
+                                
+                                ui.label("Profile:");
+                                ui.label(env!("PROFILE"));
+                                ui.end_row();
+                                
+                                let git_hash = env!("GIT_HASH");
+                                if git_hash != "unknown" {
+                                    ui.label("Git Hash:");
+                                    ui.label(format!("{}", &git_hash[..8.min(git_hash.len())]));
+                                    ui.end_row();
+                                }
+                                
+                                let git_branch = env!("GIT_BRANCH");
+                                if git_branch != "unknown" {
+                                    ui.label("Git Branch:");
+                                    ui.label(git_branch);
+                                    ui.end_row();
+                                }
+                                
+                                ui.label("Built:");
+                                ui.label(env!("BUILD_TIMESTAMP"));
+                                ui.end_row();
+                            });
+                    });
+                    
+                    ui.add_space(15.0);
+                    
+                    // Description
+                    ui.group(|ui| {
+                        ui.label(RichText::new("📝 Description").strong());
+                        ui.add_space(5.0);
+                        ui.label(env!("APP_DESCRIPTION"));
+                        ui.add_space(5.0);
+                        ui.label("A comprehensive desktop toolbox providing Android development tools including ADB and Fastboot utilities with an intuitive graphical interface.");
+                    });
+                    
+                    ui.add_space(15.0);
+                    
+                    // Features
+                    ui.group(|ui| {
+                        ui.label(RichText::new("✨ Key Features").strong());
+                        ui.add_space(5.0);
+                        ui.label("• Android Debug Bridge (ADB) Tools");
+                        ui.label("• Fastboot Tools for Bootloader Management");
+                        ui.label("• Device Monitoring with Real-time Plots");
+                        ui.label("• File Transfer & App Management");
+                        ui.label("• Configurable Interface & Settings");
+                    });
+                    
+                    ui.add_space(15.0);
+                    
+                    // Technology Stack
+                    ui.group(|ui| {
+                        ui.label(RichText::new("🔧 Built With").strong());
+                        ui.add_space(5.0);
+                        ui.horizontal(|ui| {
+                            ui.label("Made with");
+                            ui.hyperlink_to("🦀 Rust", "https://www.rust-lang.org/");
+                            ui.label("and");
+                            ui.hyperlink_to("egui", "https://github.com/emilk/egui");
+                        });
+                        ui.horizontal(|ui| {
+                            ui.label("Powered by");
+                            ui.hyperlink_to("eframe", "https://docs.rs/eframe/");
+                            ui.label("framework");
+                        });
+                    });
+                    
+                    ui.add_space(20.0);
+                    ui.separator();
                     ui.add_space(10.0);
                     
-                    ui.label(format!("Version: {}", env!("APP_VERSION")));
-                    ui.label(format!("Target: {}", env!("TARGET")));
-                    ui.label(format!("Profile: {}", env!("PROFILE")));
-                    
-                    let git_hash = env!("GIT_HASH");
-                    if git_hash != "unknown" {
-                        ui.label(format!("Git Hash: {}", git_hash));
-                    }
-                    
-                    let git_branch = env!("GIT_BRANCH");
-                    if git_branch != "unknown" {
-                        ui.label(format!("Git Branch: {}", git_branch));
-                    }
-                    
-                    ui.label(format!("Built: {}", env!("BUILD_TIMESTAMP")));
-                    
-                    ui.add_space(10.0);
-                    ui.label(env!("APP_DESCRIPTION"));
-                    
-                    ui.add_space(10.0);
+                    // Close button
                     ui.horizontal(|ui| {
-                        ui.label("Built with");
-                        ui.hyperlink_to("🦀 Rust", "https://www.rust-lang.org/");
-                        ui.label("and");
-                        ui.hyperlink_to("egui", "https://github.com/emilk/egui");
+                        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                            if ui.button(" Close ").clicked() {
+                                self.about_open = false;
+                            }
+                        });
                     });
                 });
             });
